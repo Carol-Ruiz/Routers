@@ -152,11 +152,12 @@ img.small-imagotipo {
     transition: all 0.3s ease;
 }
 
+
 .login-page .message button:hover,
 .register-page .message button:hover {
     background: var(--color-boton-fondo-hover);
     color: var(--color-boton-texto-hover);
-    transform: translateY(-2px) rotate(10deg);
+    
   
 }
 
