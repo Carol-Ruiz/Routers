@@ -93,3 +93,37 @@ coverage.xml
 .mypy_cache/
 .pytest_cache/
 .hypothesis/
+
+# === ARCHIVOS DE HERRAMIENTAS DE CONSTRUCCIÓN ===
+*.spec
+dist/
+build/
+
+# === ARCHIVOS DE EDITORES ===
+*.sublime-workspace
+*.sublime-project
+
+# === ARCHIVOS DE DOCKER ===
+Dockerfile*
+docker-compose*.yml
+*.dockerignore
+
+# === ARCHIVOS DE PRUEBAS Y COBERTURA ===
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+
+# === ARCHIVOS DE FRONTEND Y NODE ===
+frontend/node_modules/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.pnpm-debug.log*

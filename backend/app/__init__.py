@@ -1,10 +1,20 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 from backend.config import config
 from backend.models import db
 
-import os
+
+# Routers
+from backend.routes.auth import auth_bp
+from backend.routes.usuario_routes import usuario_bp
+from backend.routes.sala_routes import sala_bp
+from backend.routes.tarea_routes import tarea_bp
+from backend.routes.sesion_routes import sesion_bp
+from backend.routes.tecnica_routes import tecnica_bp
+from backend.routes.recompensa_routes import recompensa_bp
+from backend.routes.progreso_routes import progreso_bp
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -14,10 +24,13 @@ def create_app(config_name='development'):
     
     # Inicializar extensiones
     db.init_app(app)
-    CORS(app, origins=app.config['CORS_ORIGINS'])
+    CORS(app, origins=app.config.get('CORS_ORIGINS', '*'))
     jwt = JWTManager(app)
     
-    # Registrar blueprints (rutas)
+    # Inicializar migraciones aquí (solo si quieres migrar desde aquí)
+    migrate = Migrate(app, db)
+    
+    # Registrar blueprints
     from backend.routes.auth import auth_bp
     from backend.routes.usuario_routes import usuario_bp
     from backend.routes.sala_routes import sala_bp
@@ -26,7 +39,6 @@ def create_app(config_name='development'):
     from backend.routes.tecnica_routes import tecnica_bp
     from backend.routes.recompensa_routes import recompensa_bp
     from backend.routes.progreso_routes import progreso_bp
-
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(usuario_bp, url_prefix='/api/usuarios')
@@ -37,17 +49,15 @@ def create_app(config_name='development'):
     app.register_blueprint(recompensa_bp, url_prefix='/api/recompensas')
     app.register_blueprint(progreso_bp, url_prefix='/api/progreso')
     
-    # Crear tablas
+    # Crear tablas y roles por defecto solo si es necesario
     with app.app_context():
         db.create_all()
         
-        # Crear roles por defecto
         from backend.models import Rol
         if not Rol.query.first():
             admin_role = Rol(nombre='administrador')
             user_role = Rol(nombre='usuario')
-            db.session.add(admin_role)
-            db.session.add(user_role)
+            db.session.add_all([admin_role, user_role])
             db.session.commit()
     
     return app

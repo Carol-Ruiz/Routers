@@ -1,3 +1,9 @@
+import sys
+import os
+
+# Agrega la raíz del proyecto al path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
 from backend.app import create_app
 from backend.models import db, Rol, Tecnica, Recompensa
 import json
@@ -21,14 +27,14 @@ def insertar_datos_iniciales():
         # Crear técnicas de estudio básicas
         if not Tecnica.query.first():
             tecnicas = [
-                Tecnica(nombre='Pomodoro', categoria='Gestión del tiempo'),
-                Tecnica(nombre='Timeboxing', categoria='Gestión del tiempo'),
-                Tecnica(nombre='Técnica Feynman', categoria='Comprensión'),
-                Tecnica(nombre='Mapas mentales', categoria='Organización'),
-                Tecnica(nombre='Repetición espaciada', categoria='Memorización'),
-                Tecnica(nombre='Método Cornell', categoria='Toma de notas'),
-                Tecnica(nombre='Lectura activa', categoria='Comprensión'),
-                Tecnica(nombre='Flashcards', categoria='Memorización')
+                Tecnica(nombre='Pomodoro', categoria='Gestión del tiempo', descripcion='Técnica de estudio por intervalos de 25 minutos', duracion_estimada=25),
+                Tecnica(nombre='Timeboxing', categoria='Gestión del tiempo', descripcion='Asignación estricta de tiempo a tareas', duracion_estimada=30),
+                Tecnica(nombre='Técnica Feynman', categoria='Comprensión', descripcion='Aprender explicando con tus propias palabras', duracion_estimada=40),
+                Tecnica(nombre='Mapas mentales', categoria='Organización', descripcion='Visualizar ideas y relaciones', duracion_estimada=20),
+                Tecnica(nombre='Repetición espaciada', categoria='Memorización', descripcion='Revisar contenido en intervalos crecientes', duracion_estimada=15),
+                Tecnica(nombre='Método Cornell', categoria='Toma de notas', descripcion='Técnica estructurada para tomar apuntes', duracion_estimada=45),
+                Tecnica(nombre='Lectura activa', categoria='Comprensión', descripcion='Leer con objetivos claros y preguntas', duracion_estimada=30),
+                Tecnica(nombre='Flashcards', categoria='Memorización', descripcion='Uso de tarjetas de preguntas y respuestas', duracion_estimada=10)
             ]
             for tecnica in tecnicas:
                 db.session.add(tecnica)

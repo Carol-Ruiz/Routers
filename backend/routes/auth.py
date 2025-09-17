@@ -29,7 +29,7 @@ def register():
             Username=data.get('Username'),
             correo=data['correo'],
             password=generate_password_hash(data['password']),
-            rol_id=rol_usuario.rol_id
+            rol_id=rol_usuario.id
         )
         
         db.session.add(nuevo_usuario)
