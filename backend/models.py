@@ -7,6 +7,7 @@ db = SQLAlchemy()
 def generate_uuid():
     return str(uuid.uuid4())
 
+
 # Modelo Rol
 class Rol(db.Model):
     __tablename__ = 'rol'
@@ -27,7 +28,7 @@ class Usuario(db.Model):
     __tablename__ = 'usuario'
 
     id_usuario = db.Column(db.String(36), primary_key=True, default=generate_uuid)
-    Username = db.Column(db.String(100), nullable=True)
+    Username = db.Column(db.String(100), unique=True, nullable=False)  # 🔧 CAMBIO AQUÍ
     correo = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     fecha_registro = db.Column(db.DateTime(6), default=datetime.utcnow, nullable=False)
@@ -47,8 +48,11 @@ class Usuario(db.Model):
             'Username': self.Username,
             'correo': self.correo,
             'fecha_registro': self.fecha_registro.isoformat() if self.fecha_registro else None,
-            'ultimo_ac
+            'ultimo_acceso': self.ultimo_acceso.isoformat() if self.ultimo_acceso else None,
+            'rol_id': self.rol_id,
+            'activo': self.activo
         }
+
 
 # Modelo Sala
 class Sala(db.Model):
@@ -72,12 +76,10 @@ class Sala(db.Model):
             'creador_id': self.creador_id
         }
 
-# UsuarioSala
+# modelo sala
 class UsuarioSala(db.Model):
     __tablename__ = 'usuariosala'
-ceso': self.ultimo_acceso.isoformat() if self.ultimo_acceso else None,
-            'rol_id': self.rol_id,
-            'activo': self.activo
+
     id_usuario = db.Column(db.String(36), db.ForeignKey('usuario.id_usuario'), primary_key=True)
     id_sala = db.Column(db.String(36), db.ForeignKey('sala.id_sala'), primary_key=True)
     fecha_union = db.Column(db.DateTime(6), default=datetime.utcnow, nullable=False)
@@ -88,6 +90,7 @@ ceso': self.ultimo_acceso.isoformat() if self.ultimo_acceso else None,
             'id_sala': self.id_sala,
             'fecha_union': self.fecha_union.isoformat()
         }
+
 
 # Modelo Tarea
 class Tarea(db.Model):

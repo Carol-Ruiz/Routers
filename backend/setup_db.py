@@ -14,7 +14,7 @@ from backend.config import config
 HOST = 'localhost'
 PORT = 3307
 USER = 'root'
-PASSWORD = 'koal'
+PASSWORD = '123456789'
 DATABASE = 'synapse_db'
 
 def create_database():
