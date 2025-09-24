@@ -67,7 +67,6 @@ def get_progreso_hoy():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 @progreso_bp.route('/actualizar', methods=['POST'])
 @jwt_required()
 def actualizar_progreso():
@@ -80,7 +79,7 @@ def actualizar_progreso():
             func.sum(Sesion.duracion_real)
         ).filter(
             Sesion.usuario_id == usuario_id,
-            func.date(Sesion.inicio) == hoy,
+            func.date(Sesion.fecha_inicio) == hoy,  # Cambié 'inicio' por 'fecha_inicio'
             Sesion.estado == 'Completado'
         ).scalar() or 0
         
@@ -92,7 +91,7 @@ def actualizar_progreso():
         
         sesiones_realizadas = Sesion.query.filter(
             Sesion.usuario_id == usuario_id,
-            func.date(Sesion.inicio) == hoy,
+            func.date(Sesion.fecha_inicio) == hoy,  # Cambié 'inicio' por 'fecha_inicio'
             Sesion.estado == 'Completado'
         ).count()
         
@@ -126,6 +125,7 @@ def actualizar_progreso():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
 @progreso_bp.route('/semana', methods=['GET'])
 @jwt_required()
@@ -273,7 +273,7 @@ def get_estadisticas_generales():
         
         # Técnica más utilizada
         tecnica_favorita = db.session.query(
-            func.count(Sesion.sesion_id).label('total'),
+            func.count(Sesion.id_sesion).label('total'),
             Sesion.tecnica_id
         ).filter_by(usuario_id=usuario_id).group_by(
             Sesion.tecnica_id

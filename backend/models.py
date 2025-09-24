@@ -63,6 +63,7 @@ class Sala(db.Model):
     descripcion = db.Column(db.Text, nullable=True)
     fecha_creacion = db.Column(db.DateTime(6), default=datetime.utcnow, nullable=False)
     creador_id = db.Column(db.String(36), db.ForeignKey('usuario.id_usuario'), nullable=False)
+    max_participantes = db.Column(db.Integer, nullable=True)  # Aquí agregamos el campo
 
     usuarios_sala = db.relationship('UsuarioSala', backref='sala_usuario', lazy=True)
     sesiones_sala = db.relationship('SalaSesion', backref='sala_sesion_rel', lazy=True)
@@ -73,7 +74,8 @@ class Sala(db.Model):
             'nombre': self.nombre,
             'descripcion': self.descripcion,
             'fecha_creacion': self.fecha_creacion.isoformat() if self.fecha_creacion else None,
-            'creador_id': self.creador_id
+            'creador_id': self.creador_id,
+            'max_participantes': self.max_participantes  # Agregar este campo al dict
         }
 
 # modelo sala
@@ -101,7 +103,8 @@ class Tarea(db.Model):
     titulo = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.Text, nullable=True)
     fecha_creacion = db.Column(db.DateTime(6), default=datetime.utcnow, nullable=False)
-    completada = db.Column(db.Boolean, default=False)
+    completada = db.Column(db.Boolean, default=False),
+    estado = db.Column(db.String(20), nullable=False)  
 
     def to_dict(self):
         return {
@@ -110,7 +113,8 @@ class Tarea(db.Model):
             'titulo': self.titulo,
             'descripcion': self.descripcion,
             'fecha_creacion': self.fecha_creacion.isoformat(),
-            'completada': self.completada
+            'completada': self.completada,
+            'estado': self.estado
         }
 
 # Modelo Tecnica
@@ -145,6 +149,9 @@ class Sesion(db.Model):
     fecha_inicio = db.Column(db.DateTime(6), default=datetime.utcnow, nullable=False)
     fecha_fin = db.Column(db.DateTime(6), nullable=True)
     completada = db.Column(db.Boolean, default=False)
+    duracion_real = db.Column(db.Integer, nullable=False)  
+    estado = db.Column(db.String(20), nullable=False) 
+
 
     def to_dict(self):
         return {
@@ -153,7 +160,9 @@ class Sesion(db.Model):
             'tecnica_id': self.tecnica_id,
             'fecha_inicio': self.fecha_inicio.isoformat(),
             'fecha_fin': self.fecha_fin.isoformat() if self.fecha_fin else None,
-            'completada': self.completada
+            'completada': self.completada,
+            'duracion_real': self.duracion_real,
+            'estado': self.estado  
         }
 
 # Modelo SalaSesion
@@ -174,14 +183,14 @@ class SesionTecnicaParam(db.Model):
     __tablename__ = 'sesiontecnicaparam'
 
     id_param = db.Column(db.String(36), primary_key=True, default=generate_uuid)
-    sesion_id = db.Column(db.String(36), db.ForeignKey('sesion.id_sesion'), nullable=False)
+    id_sesion = db.Column(db.String(36), db.ForeignKey('sesion.id_sesion'), nullable=False)
     parametro = db.Column(db.String(100), nullable=False)
     valor = db.Column(db.String(100), nullable=False)
 
     def to_dict(self):
         return {
             'id_param': self.id_param,
-            'sesion_id': self.sesion_id,
+            'id_sesion': self.id_sesion,
             'parametro': self.parametro,
             'valor': self.valor
         }
@@ -193,14 +202,13 @@ class Recompensa(db.Model):
     id_recompensa = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.Text, nullable=True)
-
-    # 🔧 Cambiado de nullable=False a nullable=True para evitar errores con valores None
     puntos_requeridos = db.Column(db.Integer, nullable=True)
-
-    # Campos adicionales para las recompensas dinámicas:
     tipo = db.Column(db.String(50), nullable=False)
     valor = db.Column(db.Integer, nullable=False)
     requisitos = db.Column(db.JSON, nullable=False)
+
+    # Relación con RecompensaUsuario
+    usuarios_recompensa = db.relationship('RecompensaUsuario', backref='recompensa', lazy=True)
 
     def to_dict(self):
         return {
@@ -238,6 +246,8 @@ class Progreso(db.Model):
     tareas_completadas = db.Column(db.Integer, default=0, nullable=False)
     sesiones_completadas = db.Column(db.Integer, default=0, nullable=False)
     puntos_acumulados = db.Column(db.Integer, default=0, nullable=False)
+    minutos_estudio = db.Column(db.Integer, default=0, nullable=False)  # Asegúrate de que esté aquí
+    sesiones_realizadas = db.Column(db.Integer, default=0, nullable=False)  # Este campo debe estar aquí
 
     def to_dict(self):
         return {
@@ -246,5 +256,7 @@ class Progreso(db.Model):
             'fecha': self.fecha.isoformat(),
             'tareas_completadas': self.tareas_completadas,
             'sesiones_completadas': self.sesiones_completadas,
-            'puntos_acumulados': self.puntos_acumulados
+            'puntos_acumulados': self.puntos_acumulados,
+            'minutos_estudio': self.minutos_estudio,  # Asegúrate de que también esté en el diccionario
+            'sesiones_realizadas': self.sesiones_realizadas  # Este también
         }

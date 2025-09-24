@@ -109,9 +109,6 @@ def delete_recompensa(recompensa_id):
         if not recompensa:
             return jsonify({'error': 'Recompensa no encontrada'}), 404
         
-        # Verificar si la recompensa ha sido otorgada a usuarios
-        if recompensa.usuarios_recompensa:
-            return jsonify({'error': 'No se puede eliminar una recompensa que ya ha sido otorgada'}), 400
         
         db.session.delete(recompensa)
         db.session.commit()
@@ -122,17 +119,18 @@ def delete_recompensa(recompensa_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
 @recompensa_bp.route('/mis-recompensas', methods=['GET'])
 @jwt_required()
 def get_mis_recompensas():
     try:
-        usuario_id = get_jwt_identity()
+        id_usuario = get_jwt_identity()
         
         # Obtener recompensas del usuario
         recompensas_usuario = db.session.query(
             RecompensaUsuario, Recompensa
         ).join(Recompensa).filter(
-            RecompensaUsuario.usuario_id == usuario_id
+            RecompensaUsuario.id_usuario == id_usuario  
         ).order_by(RecompensaUsuario.fecha_otorgada.desc()).all()
         
         resultado = []
@@ -141,7 +139,7 @@ def get_mis_recompensas():
             recompensa_dict.update({
                 'fecha_otorgada': recompensa_usuario.fecha_otorgada.isoformat(),
                 'consumida': recompensa_usuario.consumida,
-                'recompensa_usuario_id': recompensa_usuario.recompensa_usuario_id
+                'recompensa_id_usuario': recompensa_usuario.id_usuario  # Corregido el campo
             })
             resultado.append(recompensa_dict)
         
@@ -154,34 +152,34 @@ def get_mis_recompensas():
 @jwt_required()
 def get_recompensas_disponibles():
     try:
-        usuario_id = get_jwt_identity()
+        id_usuario = get_jwt_identity()
         
         # Obtener estadísticas del usuario para evaluar requisitos
         from models import Sesion, Tarea, Progreso
         
         # Sesiones completadas
         sesiones_completadas = Sesion.query.filter_by(
-            usuario_id=usuario_id, 
+            id_usuario=id_usuario, 
             estado='Completado'
         ).count()
         
         # Tareas completadas
         tareas_completadas = Tarea.query.filter_by(
-            usuario_id=usuario_id,
+            id_usuario=id_usuario,
             estado='Completado'
         ).count()
         
         # Tiempo total de estudio
         tiempo_total = db.session.query(
             db.func.sum(Sesion.duracion_real)
-        ).filter_by(usuario_id=usuario_id, estado='Completado').scalar() or 0
+        ).filter_by(id_usuario=id_usuario, estado='Completado').scalar() or 0
         
         # Días consecutivos (simplificado)
-        dias_consecutivos = Progreso.query.filter_by(usuario_id=usuario_id).count()
+        dias_consecutivos = Progreso.query.filter_by(id_usuario=id_usuario).count()
         
         # Recompensas ya obtenidas
         recompensas_obtenidas = db.session.query(RecompensaUsuario.recompensa_id).filter_by(
-            usuario_id=usuario_id
+            id_usuario=id_usuario
         ).subquery()
         
         # Recompensas disponibles (no obtenidas)
@@ -215,7 +213,7 @@ def get_recompensas_disponibles():
 def otorgar_recompensa():
     try:
         data = request.get_json()
-        usuario_id = get_jwt_identity()
+        id_usuario = get_jwt_identity()
         
         recompensa_id = data.get('recompensa_id')
         if not recompensa_id:
@@ -227,7 +225,7 @@ def otorgar_recompensa():
         
         # Verificar si ya tiene esta recompensa
         ya_tiene = RecompensaUsuario.query.filter_by(
-            usuario_id=usuario_id,
+            id_usuario=id_usuario,
             recompensa_id=recompensa_id
         ).first()
         
@@ -239,7 +237,7 @@ def otorgar_recompensa():
         
         # Otorgar recompensa
         nueva_recompensa_usuario = RecompensaUsuario(
-            usuario_id=usuario_id,
+            id_usuario=id_usuario,
             recompensa_id=recompensa_id
         )
         
@@ -255,15 +253,15 @@ def otorgar_recompensa():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-@recompensa_bp.route('/consumir/<int:recompensa_usuario_id>', methods=['PATCH'])
+@recompensa_bp.route('/consumir/<int:recompensa_id_usuario>', methods=['PATCH'])
 @jwt_required()
-def consumir_recompensa(recompensa_usuario_id):
+def consumir_recompensa(recompensa_id_usuario):
     try:
-        usuario_id = get_jwt_identity()
+        id_usuario = get_jwt_identity()
         
         recompensa_usuario = RecompensaUsuario.query.filter_by(
-            recompensa_usuario_id=recompensa_usuario_id,
-            usuario_id=usuario_id
+            id=recompensa_id_usuario,  # Corregido el nombre del campo
+            id_usuario=id_usuario
         ).first()
         
         if not recompensa_usuario:
@@ -289,7 +287,7 @@ def evaluar_requisitos(requisitos, stats_usuario):
                 if stats_usuario[key] < valor_requerido:
                     return False
         return True
-    except:
+    except Exception as e:
         return False
 
 def calcular_progreso_requisitos(requisitos, stats_usuario):
@@ -306,5 +304,6 @@ def calcular_progreso_requisitos(requisitos, stats_usuario):
                     'porcentaje': round(porcentaje, 2)
                 }
         return progreso
-    except:
+    except Exception as e:
         return {}
+

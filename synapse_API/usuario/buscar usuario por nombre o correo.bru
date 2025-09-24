@@ -1,13 +1,17 @@
 meta {
-  name: obtener un recompensa especifica
+  name: buscar usuario por nombre o correo
   type: http
-  seq: 3
+  seq: 6
 }
 
 get {
-  url: http://127.0.0.1:5000/api/recompensas/e0b6f00a-bf96-48d9-a7b4-7f227af33e26
+  url: http://127.0.0.1:5000/api/usuarios/search?q=u
   body: none
   auth: inherit
+}
+
+params:query {
+  q: u
 }
 
 headers {
