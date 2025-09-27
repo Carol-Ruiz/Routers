@@ -47,30 +47,33 @@ def get_tarea(tarea_id):
         return jsonify(tarea.to_dict()), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 @tarea_bp.route('', methods=['POST'])
 @jwt_required()
 def create_tarea():
     try:
         usuario_id = get_jwt_identity()
         data = request.get_json()
-        
+
+        print(f"usuario_id: {usuario_id}, sala_id: {data.get('sala_id')}")
+
         # Validar datos requeridos
         if not data.get('titulo'):
             return jsonify({'error': 'El título es requerido'}), 400
-        
-        # Validar sala_id si se proporciona
+
         sala_id = data.get('sala_id')
         if sala_id:
             # Verificar que el usuario pertenece a la sala
             usuario_sala = UsuarioSala.query.filter_by(
-                usuario_id=usuario_id,
-                sala_id=sala_id,
+                id_usuario=usuario_id,
+                id_sala=sala_id,
                 activo=True
             ).first()
+
+            print(f"usuario_sala: {usuario_sala}")  # Para ver si la relación existe
+
             if not usuario_sala:
                 return jsonify({'error': 'No perteneces a esta sala'}), 403
-        
+
         # Parsear fecha de vencimiento si se proporciona
         fecha_vencimiento = None
         if data.get('fecha_vencimiento'):
@@ -78,7 +81,7 @@ def create_tarea():
                 fecha_vencimiento = datetime.strptime(data['fecha_vencimiento'], '%Y-%m-%d').date()
             except ValueError:
                 return jsonify({'error': 'Formato de fecha inválido (YYYY-MM-DD)'}), 400
-        
+
         # Crear nueva tarea
         nueva_tarea = Tarea(
             usuario_id=usuario_id,
@@ -90,15 +93,16 @@ def create_tarea():
             estado=data.get('estado', 'Pendiente'),
             comentario=data.get('comentario')
         )
-        
+
         db.session.add(nueva_tarea)
         db.session.commit()
-        
+
         return jsonify(nueva_tarea.to_dict()), 201
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
 
 @tarea_bp.route('/<string:tarea_id>', methods=['PUT'])
 @jwt_required()
