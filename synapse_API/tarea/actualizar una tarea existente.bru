@@ -5,13 +5,29 @@ meta {
 }
 
 put {
-  url: http://127.0.0.1:5000/api/tareas/<string:tarea_id>
-  body: none
+  url: http://127.0.0.1:5000/api/tareas/b8a098cb-16de-4d4a-b04e-251191337c21
+  body: json
   auth: inherit
 }
 
 headers {
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1ODk0NDMyMiwianRpIjoiZjU2MjFkNGQtN2JmMC00ZjUwLTkzZDgtOThlNGJhMGQ2Njc1IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImYzZmU3NGExLTc0YWYtNGQ5NC1iNGU2LThhM2RlYjIzNTI1MCIsIm5iZiI6MTc1ODk0NDMyMiwiY3NyZiI6IjZjYzM1YjlmLTA3YjctNDc4Yy1hNTBlLTUyZTQyNzc0MzllZSIsImV4cCI6MTc1OTAzMDcyMn0.YfNy0f7rku2IJkZeJUHw7ipTgBuNlWXP0em2CS-Trvo
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc1OTEwODIxNywianRpIjoiY2RmMWQyOGItNTUyZC00Y2YyLWI1ZWMtMDQ5ZjgzZDk2NzcxIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6ImYzZmU3NGExLTc0YWYtNGQ5NC1iNGU2LThhM2RlYjIzNTI1MCIsIm5iZiI6MTc1OTEwODIxNywiY3NyZiI6IjUwOTkyYzdjLTFhOTAtNDk1YS04M2QwLTgyMGZiMWNlNzZkNyIsImV4cCI6MTc1OTE5NDYxN30.t5Z-jBiLjnng5Lq9hhFNws17WEb0Ufuw-rWxi_cJ-WY
+}
+
+body:json {
+  {
+    "comentario": "Revisar la teoría antes del examen.",
+    "completada": false,
+    "descripcion": "Repasar los temas de álgebra, cálculo y geometría y matematicas.",
+    "estado": "Pendiente",
+    "fecha_creacion": "2025-09-29T02:59:58",
+    "fecha_vencimiento": "2025-11-10",
+    "id_tarea": "b8a098cb-16de-4d4a-b04e-251191337c21",
+    "prioridad": "alta",
+    "sala_id": "7919c6c5-ff1c-4595-8068-09e9280a5378",
+    "titulo": "Estudiar matemáticas para el examen",
+    "usuario_id": "f3fe74a1-74af-4d94-b4e6-8a3deb235250"
+  }
 }
 
 settings {

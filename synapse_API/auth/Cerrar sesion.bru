@@ -1,11 +1,11 @@
 meta {
-  name: obtener estadisticas de la tarea
+  name: Cerrar sesion
   type: http
-  seq: 7
+  seq: 5
 }
 
-get {
-  url: http://127.0.0.1:5000/api/tareas/estadisticas
+post {
+  url: http://127.0.0.1:5000/api/auth/logout
   body: none
   auth: inherit
 }

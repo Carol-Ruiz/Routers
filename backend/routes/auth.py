@@ -124,3 +124,13 @@ def change_password():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+@auth_bp.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    try:
+    
+        
+        return jsonify({'message': 'Sesión cerrada exitosamente'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

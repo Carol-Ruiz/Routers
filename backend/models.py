@@ -109,11 +109,17 @@ class Tarea(db.Model):
 
     id_tarea = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     usuario_id = db.Column(db.String(36), db.ForeignKey('usuario.id_usuario'), nullable=False)
+    sala_id = db.Column(db.String(36), db.ForeignKey('sala.id_sala'), nullable=True)  # Relación con Sala
     titulo = db.Column(db.String(200), nullable=False)
     descripcion = db.Column(db.Text, nullable=True)
     fecha_creacion = db.Column(db.DateTime(6), default=datetime.utcnow, nullable=False)
     completada = db.Column(db.Boolean, default=False)
     estado = db.Column(db.String(20), nullable=False)  
+    fecha_vencimiento = db.Column(db.Date, nullable=True)
+    prioridad = db.Column(db.String(20), default='baja', nullable=False)
+    comentario = db.Column(db.Text, nullable=True)
+
+    sala = db.relationship('Sala', backref='tareas', lazy=True)
 
     def to_dict(self):
         return {
@@ -123,7 +129,11 @@ class Tarea(db.Model):
             'descripcion': self.descripcion,
             'fecha_creacion': self.fecha_creacion.isoformat(),
             'completada': self.completada,
-            'estado': self.estado
+            'estado': self.estado,
+            'fecha_vencimiento': self.fecha_vencimiento.isoformat() if self.fecha_vencimiento else None,
+            'prioridad': self.prioridad,
+            'comentario': self.comentario,
+            'sala_id': self.sala_id
         }
 
 # Modelo Tecnica
@@ -270,6 +280,6 @@ class Progreso(db.Model):
             'tareas_completadas': self.tareas_completadas,
             'sesiones_completadas': self.sesiones_completadas,
             'puntos_acumulados': self.puntos_acumulados,
-            'minutos_estudio': self.minutos_estudio,  # Asegúrate de que también esté en el diccionario
-            'sesiones_realizadas': self.sesiones_realizadas  # Este también
+            'minutos_estudio': self.minutos_estudio,  
+            'sesiones_realizadas': self.sesiones_realizadas  
         }
